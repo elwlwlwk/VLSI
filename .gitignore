@@ -178,3 +178,7 @@ bin/
 \.settings/
 
 \.idea/
+
+*.ipynb
+
+*.py
