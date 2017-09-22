@@ -181,6 +181,4 @@ bin/
 
 *.ipynb
 
-*.py
-
 output/
