@@ -20,7 +20,6 @@ import tspUtil.MapInfo;
 import tspUtil.PathCheck;
 
 public class MainClass {
-
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		System.out.print("Enter Map name (Usually Sample.txt): ");
