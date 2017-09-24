@@ -2,6 +2,7 @@ package sa;
 
 import java.util.Arrays;
 
+import greedy.ThreeOptSearch;
 import greedy.TwoOptSearch;
 import tspUtil.GetTwoRandomNumber;
 import tspUtil.PathCheck;
@@ -48,9 +49,8 @@ public class SASearch extends TSPAlgorithm{
 		int[] copyPath = Arrays.copyOf(path, path.length);
 		int bestScore = PathCheck.getPathCost(copyPath);
 		while (this.temperature > 1) {
-			
 			int[] trialPath = Arrays.copyOf(copyPath, copyPath.length);
-			
+			/*
 			for(int i = 0; i < this.numOfNextHop ; i++){
 				int[] twoRandNumber = GetTwoRandomNumber.getTwoRandomNumber();
 				int firstPoint = twoRandNumber[0];
@@ -59,7 +59,8 @@ public class SASearch extends TSPAlgorithm{
 			}
 			
 			trialPath = this.twoOptSearch.calculatePath(trialPath);
-			
+			*/
+			trialPath = ThreeOptSearch.swap(trialPath);
 			int trialScore = PathCheck.getPathCost(trialPath);
 			if (Math.random() < this.getAcceptProbability(bestScore, trialScore)) {
 				copyPath = Arrays.copyOf(trialPath, trialPath.length);
