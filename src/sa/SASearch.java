@@ -5,6 +5,7 @@ import java.util.Arrays;
 import greedy.ThreeOptSearch;
 import greedy.TwoOptSearch;
 import tspUtil.GetTwoRandomNumber;
+import tspUtil.Initialize;
 import tspUtil.PathCheck;
 import tspUtil.TSPAlgorithm;
 
@@ -12,6 +13,7 @@ public class SASearch extends TSPAlgorithm{
 	private double temperature;
 	private double deltaTemperature;
 	private int numOfNextHop;
+	
 	
 	private TwoOptSearch twoOptSearch;
 	
@@ -37,7 +39,7 @@ public class SASearch extends TSPAlgorithm{
 	@Override
 	public int[] calculatePath(int startPoint) {
 		// TODO Auto-generated method stub
-		int[] path = this.twoOptSearch.calculatePath(startPoint);
+		int[] path = Initialize.getInstance().getPath();
 		path = this.calculatePath(path);
 		return path;
 	}
@@ -47,7 +49,7 @@ public class SASearch extends TSPAlgorithm{
 		// TODO Auto-generated method stub
 
 		int[] copyPath = Arrays.copyOf(path, path.length);
-		int bestScore = PathCheck.getPathCost(copyPath);
+		double bestScore = PathCheck.getPathCost(copyPath);
 		while (this.temperature > 1) {
 			int[] trialPath = Arrays.copyOf(copyPath, copyPath.length);
 			/*
@@ -61,7 +63,7 @@ public class SASearch extends TSPAlgorithm{
 			trialPath = this.twoOptSearch.calculatePath(trialPath);
 			*/
 			trialPath = ThreeOptSearch.swap(trialPath);
-			int trialScore = PathCheck.getPathCost(trialPath);
+			double trialScore = PathCheck.getPathCost(trialPath);
 			if (Math.random() < this.getAcceptProbability(bestScore, trialScore)) {
 				copyPath = Arrays.copyOf(trialPath, trialPath.length);
 				bestScore = trialScore;
@@ -72,7 +74,7 @@ public class SASearch extends TSPAlgorithm{
 		return copyPath;
 	}
 
-	private double getAcceptProbability(int bestScore, int trialScore) {
+	private double getAcceptProbability(double bestScore, double trialScore) {
 		if (bestScore > trialScore)
 			return 1;
 		else {
