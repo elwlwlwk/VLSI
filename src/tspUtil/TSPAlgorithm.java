@@ -1,12 +1,12 @@
 package tspUtil;
 
 public abstract class TSPAlgorithm {
-	protected int map[][];
+	protected double map[][];
 	protected int numOfCity;
 	
 	public TSPAlgorithm(){
-		this.map = MapInfo.getInstance().getDistanceMap();
-		this.numOfCity = MapInfo.getInstance().getNumOfCity();
+		this.map = Initialize.getInstance().getDistances();
+		this.numOfCity = Initialize.getInstance().getNumOfCity();
 	}
 	
 	public abstract int [] calculatePath(int startPoint);
