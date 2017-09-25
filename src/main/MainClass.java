@@ -18,6 +18,7 @@ import greedy.TwoOptSearch;
 import sa.SASearch;
 import tspUtil.MapInfo;
 import tspUtil.PathCheck;
+import tspUtil.Initialize;
 
 public class MainClass {
 	public static void main(String[] args) {
@@ -25,7 +26,7 @@ public class MainClass {
 		System.out.print("Enter Map name (Usually Sample.txt): ");
 		Scanner scan = new Scanner(System.in);
 		String mapName = scan.next();
-		MapInfo.setMapInfoInstance(mapName);
+		Initialize.getfile(mapName);
 		System.out.print("Select Alg (1. Nearest Neighbor, 2. Two-Opt, 3. SA, 4. GA) : ");
 
 		int input = scan.nextInt();
@@ -48,6 +49,8 @@ public class MainClass {
 			SASearch saSearch = new SASearch(temperatureTrial[3],0.8, 100000, 1);
 			int [] path3 = saSearch.calculatePath(0);
 			System.out.println("SA search: " + PathCheck.getPathCost(path3));
+			PathCheck.printPath(path3);
+			PathCheck.writePath(path3);
 			break;
 		case 4:
 			int populationSize = 100;
