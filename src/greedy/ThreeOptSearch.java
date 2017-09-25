@@ -31,7 +31,7 @@ public class ThreeOptSearch {
 		Random random= new Random();
 
 		int [] best_path= arr.clone();
-		int best_score= PathCheck.getPathCost(arr);
+		double best_score= PathCheck.getPathCost(arr);
 
 		int trial_max= 10000;
 		for(int trial=0; trial< trial_max; trial++){
@@ -58,7 +58,7 @@ public class ThreeOptSearch {
 			paths[6]= concat(concat(concat(sub_path1, rev_sub_path3), rev_sub_path2), sub_path4);
 
 			for(int i=1; i< paths.length; i++){
-				int cur_score= PathCheck.getPathCost(paths[i]);
+				double cur_score= PathCheck.getPathCost(paths[i]);
 				if(cur_score< best_score){
 					best_score= cur_score;
 					best_path= paths[i].clone();
