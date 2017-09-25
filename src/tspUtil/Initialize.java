@@ -38,9 +38,19 @@ class Node{
 }
 
 public class Initialize{
+	private static Initialize instance =null;
     private Node[] nodes;
     private double[][] distance;
     private int numOfCity;
+    private int[] path;
+    
+    public static void getfile(String filename){
+		instance = new Initialize(filename);
+	}
+    public static Initialize getInstance(){
+		return instance;
+	}
+	
 
     public Initialize(String filepath){
     	try{
@@ -56,7 +66,7 @@ public class Initialize{
 		    
 		    this.nodes = new Node[this.numOfCity];
 		    this.distance = new double[this.numOfCity][this.numOfCity];
-		    
+		    this.path= new int[this.numOfCity];
 		    for(int i = 0; i < numOfCity; i++){
 			    s = in.readLine();
 			    String[] splited = s.split(" ");
@@ -78,6 +88,7 @@ public class Initialize{
             }
             //distance[i][i]는 따로 처리 안함
         }
+        this.RandomPath();
     }
     
     public Node getNode(int index){
@@ -99,6 +110,10 @@ public class Initialize{
 		return numOfCity;
 	}
 	
+	public int[] getPath(){
+	return path;
+	}
+	
     private int getStartIndex(Node[] randomPath){
 	    int start = 0;
 	    double MAX = 0;
@@ -118,6 +133,7 @@ public class Initialize{
 	    Arrays.fill(isNoded, Boolean.TRUE);
 	    int start = getStartIndex(randomPath);
 	    randomPath[0] = nodes[start];
+	    this.path[0]=nodes[start].getIndex();
 		isNoded[start] = false;
 		
         for(int i = 1; i < numOfCity; i++){
@@ -131,6 +147,7 @@ public class Initialize{
 				}
             }
             randomPath[i] = nodes[index];
+            this.path[i]=nodes[index].getIndex();
 	        isNoded[index] = false;
         }
         nodes = randomPath;
