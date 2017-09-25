@@ -5,7 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.Math;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 class Node{
     private int index;
@@ -53,26 +55,21 @@ public class Initialize{
 	
 
     public Initialize(String filepath){
+	    String s;
+	    int i = 0;
+	    List<Node> tempNodes = new ArrayList<Node>();
     	try{
 		    BufferedReader in = new BufferedReader(new FileReader(filepath));
-		    String s;
-		    for(int i = 0; i < 5; i++){
-			    in.readLine();
-		    }
 		    s = in.readLine();
-		    numOfCity = Integer.parseInt(s.split(" : ")[1]);
-		    in.readLine();
-		    in.readLine();
-		    
-		    this.nodes = new Node[this.numOfCity];
-		    this.distance = new double[this.numOfCity][this.numOfCity];
-		    this.path= new int[this.numOfCity];
-		    for(int i = 0; i < numOfCity; i++){
-			    s = in.readLine();
+		    while(s != null) {
 			    String[] splited = s.split(" ");
-			    nodes[i] = new Node(Integer.parseInt(splited[0]),
+			    tempNodes.add(new Node(Integer.parseInt(splited[0]),
 					    Integer.parseInt(splited[1]),
-					    Integer.parseInt(splited[2]));
+					    Integer.parseInt(splited[2])));
+//			    nodes[i++] = new Node(Integer.parseInt(splited[0]),
+//					    Integer.parseInt(splited[1]),
+//					    Integer.parseInt(splited[2]));
+			    s = in.readLine();
 		    }
 	    } catch(FileNotFoundException e){
     		System.err.println("File not found");
@@ -81,8 +78,16 @@ public class Initialize{
 		    System.err.println("File Info read error");
 		    System.exit(1);
 	    }
+	    this.numOfCity = tempNodes.size();
 	    
-        for(int i = 0; i < numOfCity; i++){
+	    //Initialize fields
+	    path = new int[numOfCity];
+	    nodes = new Node[numOfCity];
+	    nodes = tempNodes.toArray(nodes);
+	    distance = new double[numOfCity][];
+     
+	    for( i = 0; i < numOfCity; i++){
+        	distance[i] = new double[numOfCity];
             for(int j = 0; j < numOfCity; j++){
                 distance[i][j] = nodes[i].getDistance(nodes[j]);
             }
