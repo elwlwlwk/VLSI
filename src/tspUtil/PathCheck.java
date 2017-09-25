@@ -1,21 +1,22 @@
+
 package tspUtil;
 
 import java.util.Arrays;
-
+import java.io.*;
 public class PathCheck {
 	/*
-	 * ¸ğµç °æ·ÎÀÇ ÇÕ °è»ê
-	 * °æ·Î Çü½ÄÀº ¸¸¾à 5°³ÀÇ µµ½Ã¸é
-	 * intÇüÀÇ ¹è¿­¿¡
+	 * ëª¨ë“  ê²½ë¡œì˜ í•© ê³„ì‚°
+	 * ê²½ë¡œ í˜•ì‹ì€ ë§Œì•½ 5ê°œì˜ ë„ì‹œë©´
+	 * intí˜•ì˜ ë°°ì—´ì—
 	 * 0 1 2 3 4 0
-	 * ¶Ç´Â
+	 * ë˜ëŠ”
 	 * 0 2 4 1 3 0
-	 * ½ÄÀÇ ÇüÅÂ¸¦ ¶ç¾î¾ßÇÔ(Ãâ¹ßÁö¿Í µµÂøÁö°¡ °°¾Æ¾ßÇÏ¸ç ¸ğµç µµ½ÃÀÇ index°¡ ÇÑ¹ø¾¿ ÀÖ¾î¾ßÇÔ)
+	 * ì‹ì˜ í˜•íƒœë¥¼ ë„ì–´ì•¼í•¨(ì¶œë°œì§€ì™€ ë„ì°©ì§€ê°€ ê°™ì•„ì•¼í•˜ë©° ëª¨ë“  ë„ì‹œì˜ indexê°€ í•œë²ˆì”© ìˆì–´ì•¼í•¨)
 	 */
-	public static int getPathCost(int [] path){
+	public static double getPathCost(int [] path){
 		
-		int totalCost = 0;
-		int [][] map = MapInfo.getInstance().getDistanceMap();
+		double totalCost = 0;
+		double [][] map = Initialize.getInstance().getDistances();
 		
 		for(int i = 0; i < path.length - 1;i++){
 			totalCost += map[path[i]][path[i+1]];
@@ -23,20 +24,20 @@ public class PathCheck {
 		return totalCost;
 	}
 	/*
-	 * °æ·Î°¡ ÀûÇÕÇÑ °æ·ÎÀÎÁö È®ÀÎ
-	 * °æ·Î Çü½ÄÀº ¸¸¾à 5°³ÀÇ µµ½Ã¸é
-	 * intÇüÀÇ ¹è¿­¿¡
+	 * ê²½ë¡œê°€ ì í•©í•œ ê²½ë¡œì¸ì§€ í™•ì¸
+	 * ê²½ë¡œ í˜•ì‹ì€ ë§Œì•½ 5ê°œì˜ ë„ì‹œë©´
+	 * intí˜•ì˜ ë°°ì—´ì—
 	 * 0 1 2 3 4 0
-	 * ¶Ç´Â
+	 * ë˜ëŠ”
 	 * 0 2 4 1 3 0
-	 * ½ÄÀÇ ÇüÅÂ¸¦ ¶ç¾î¾ßÇÔ(Ãâ¹ßÁö¿Í µµÂøÁö°¡ °°¾Æ¾ßÇÏ¸ç ¸ğµç µµ½ÃÀÇ index°¡ ÇÑ¹ø¾¿ ÀÖ¾î¾ßÇÔ)
+	 * ì‹ì˜ í˜•íƒœë¥¼ ë„ì–´ì•¼í•¨(ì¶œë°œì§€ì™€ ë„ì°©ì§€ê°€ ê°™ì•„ì•¼í•˜ë©° ëª¨ë“  ë„ì‹œì˜ indexê°€ í•œë²ˆì”© ìˆì–´ì•¼í•¨)
 	 */
 	public static boolean isPathDuplicated(int [] path){
-		boolean [] visited = new boolean[MapInfo.getInstance().getNumOfCity()];
+		boolean [] visited = new boolean[ Initialize.getInstance().getNumOfCity()];
 		
 		Arrays.fill(visited, false);
 		
-		//Ãâ¹ßÁö¿Í µµÂøÁö°¡ °°ÀºÁö È®ÀÎ
+		//ì¶œë°œì§€ì™€ ë„ì°©ì§€ê°€ ê°™ì€ì§€ í™•ì¸
 		if(path[0] != path[path.length-1]) return true;
 		
 		for(int i = 0; i < path.length-1;i++){
@@ -47,9 +48,33 @@ public class PathCheck {
 	}
 	
 	public static void printPath(int [] path){
+		System.out.println(path.length);
 		for(int i = 0; i < path.length; i++){
-			System.out.print(path[i]+ " ");
+			System.out.println(path[i]+ " ");
 		}
-		System.out.println();
+		
 	}
-}
+	public static void writePath(int [] path){
+		double score= getPathCost(path);
+		try {
+		     
+		      BufferedWriter out = new BufferedWriter(new FileWriter("result.txt"));
+		      
+		      out.write(Double.toString(score));
+		     
+		      out.write(", path : "); 
+		      for(int i = 0; i < path.length; i++){
+					out.write(Integer.toString(path[i]));
+					 out.write("\t"); 
+		      }
+		     
+		      out.close();
+		      
+		    } catch (IOException e) {
+		        System.err.println(e); 
+		        System.exit(1);
+		    }
+
+		  }
+	}
+
