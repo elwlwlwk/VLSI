@@ -25,7 +25,7 @@ public class TwoOptSearch extends TSPAlgorithm{
 	@Override
 	public int[] calculatePath(int [] path) {
 		// TODO Auto-generated method stub
-		int bestScore = PathCheck.getPathCost(path);
+		double bestScore = PathCheck.getPathCost(path);
 		
 		int [] copyPath = Arrays.copyOf(path, path.length);
 		int [] maxPath = Arrays.copyOf(path, path.length);
@@ -43,7 +43,7 @@ public class TwoOptSearch extends TSPAlgorithm{
 			
 			swapPath(trialPath, firstPoint, secondPoint);
 			
-			int currentPath = PathCheck.getPathCost(trialPath);
+			double currentPath = PathCheck.getPathCost(trialPath);
 			
 			if(bestScore > currentPath){
 				maxPath = Arrays.copyOf(trialPath, trialPath.length);
@@ -59,7 +59,7 @@ public class TwoOptSearch extends TSPAlgorithm{
 	public int[] calculatePath(int startPoint) {
 		// TODO Auto-generated method stub
 		NearestNeighbor simpleGreedy = new NearestNeighbor();
-		int [] path = simpleGreedy.calculatePath(startPoint);
+		int[] path = simpleGreedy.calculatePath(startPoint);
 		
 		path = this.calculatePath(path);
 		return path;

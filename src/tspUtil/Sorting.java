@@ -3,10 +3,10 @@ package tspUtil;
 import java.util.Arrays;
 
 public class Sorting {
-	public static int[] getIndexOfSortedArray(int [] arr){
+	public static int[] getIndexOfSortedArray(double [] arr){
 		int [] retArr = new int[arr.length];
 		boolean [] visited = new boolean[arr.length];
-		int [] sortedArr = Arrays.copyOf(arr, arr.length);
+		double [] sortedArr = Arrays.copyOf(arr, arr.length);
 		
 		Arrays.sort(sortedArr);
 		

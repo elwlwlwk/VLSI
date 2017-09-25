@@ -13,9 +13,9 @@ public class PathCheck {
 	 * 0 2 4 1 3 0
 	 * 식의 형태를 띄어야함(출발지와 도착지가 같아야하며 모든 도시의 index가 한번씩 있어야함)
 	 */
-	public static double getPathCost(int [] path){
+	public static int getPathCost(int [] path){
 		
-		double totalCost = 0;
+		int totalCost = 0;
 		double [][] map = Initialize.getInstance().getDistances();
 		
 		for(int i = 0; i < path.length - 1;i++){
@@ -64,8 +64,8 @@ public class PathCheck {
 		     
 		      out.write(", path : "); 
 		      for(int i = 0; i < path.length; i++){
-					out.write(Integer.toString(path[i]));
-					 out.write("\t"); 
+					out.write(Double.toString(path[i]));
+					out.write("\t");
 		      }
 		     
 		      out.close();

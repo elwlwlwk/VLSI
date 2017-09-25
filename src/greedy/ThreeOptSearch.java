@@ -30,7 +30,7 @@ public class ThreeOptSearch {
 	public static int[] swap(int[] arr){
 		Random random= new Random();
 
-		int [] best_path= arr.clone();
+		int[] best_path= arr.clone();
 		double best_score= PathCheck.getPathCost(arr);
 
 		int trial_max= 10000;
