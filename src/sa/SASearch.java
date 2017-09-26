@@ -38,6 +38,7 @@ public class SASearch extends TSPAlgorithm{
 	@Override
 	public int[] calculatePath(int[] path) {
 		// TODO Auto-generated method stub
+		int i = 1;
 		int[] copyPath = Arrays.copyOf(path, path.length);
 		double bestScore = PathCheck.getPathCost(copyPath);
 		while (this.temperature > 1) {
@@ -48,9 +49,28 @@ public class SASearch extends TSPAlgorithm{
 				copyPath = Arrays.copyOf(trialPath, trialPath.length);
 				bestScore = trialScore;
 			}
-			this.temperature /= (1 + Math.log(this.deltaTemperature + 1));
+			this.temperature *= quadraticCooling(i);
 		}
 		return copyPath;
+	}
+	
+	private double exponentialCooling(){
+		return this.deltaTemperature;
+	}
+	
+	private double logarithmicalCooling(int i){
+		return (1 + this.deltaTemperature * Math.log(i))
+				/ (1 + this.deltaTemperature * Math.log((i + 1)));
+	}
+	
+	private double linearCooling(int i){
+		return (1 + this.deltaTemperature * (i - 1))
+				/ (1 + this.deltaTemperature * i);
+	}
+	
+	private double quadraticCooling(int i){
+		return (1 + this.deltaTemperature * Math.pow(i - 1, 2))
+				/ (1 + this.deltaTemperature * Math.pow(i, 2));
 	}
 
 	private double getAcceptProbability(double bestScore, double trialScore) {
