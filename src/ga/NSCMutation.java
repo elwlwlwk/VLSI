@@ -28,8 +28,9 @@ public class NSCMutation implements Mutation {
 			
 			
 			swift(populationList[populationSize - i].path, firstPoint, secondPoint);
-
-			populationList[populationSize - i].cost = PathCheck.getPathCost(populationList[populationSize - i].path);
+			
+			//임시로 int로 형 변환
+			populationList[populationSize - i].cost = (int)PathCheck.getPathCost(populationList[populationSize - i].path);
 		}
 	}
 	

@@ -13,7 +13,8 @@ public class RandomInitializer implements Initializer{
 		for(int i = 0; i < populationSize; i++){
 			populationList[i] = new GAElement();
 			populationList[i].path = RandomPath.getRandomPath(startCity);
-			populationList[i].cost = PathCheck.getPathCost(populationList[i].path);
+			//임시로 int로 형 변환
+			populationList[i].cost = (int)PathCheck.getPathCost(populationList[i].path);
 		}
 		return populationList;
 	}

@@ -56,10 +56,11 @@ public class TwoOptSearch extends TSPAlgorithm{
 	}
 
 	@Override
-	public int[] calculatePath(int startPoint) {
+	public int[] calculatePath() {
+		// 임시로 0으로 설정
 		// TODO Auto-generated method stub
 		NearestNeighbor simpleGreedy = new NearestNeighbor();
-		int[] path = simpleGreedy.calculatePath(startPoint);
+		int[] path = simpleGreedy.calculatePath();
 		
 		path = this.calculatePath(path);
 		return path;

@@ -12,12 +12,13 @@ public class MyGASearch extends GASearch{
 	}
 	
 	@Override
-	public int[] calculatePath(int startPoint) {
+	public int[] calculatePath() {
 		// TODO Auto-generated method stub
 		
 		
 		this.generationScore = new int[this.generationSize];
-		this.populationList = this.initializer.initializePopulation(populationSize, startPoint);
+		//임시로 0으로 설정
+		this.populationList = this.initializer.initializePopulation(populationSize, 0);
 
 		System.out.println("Init complete");
 		GAElementComparator gaCom = new GAElementComparator();
