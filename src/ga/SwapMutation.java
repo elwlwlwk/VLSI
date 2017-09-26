@@ -24,8 +24,9 @@ public class SwapMutation implements Mutation {
 			int [] twoRandNumber = GetTwoRandomNumber.getTwoRandomNumber();
 			
 			SwapCity.swapCity(populationList[populationSize - i].path, twoRandNumber[0], twoRandNumber[1]);
-
-			populationList[populationSize - i].cost = PathCheck.getPathCost(populationList[populationSize - i].path);
+			
+			//임시로 int로 형 변환
+			populationList[populationSize - i].cost = (int)PathCheck.getPathCost(populationList[populationSize - i].path);
 
 		}
 	}

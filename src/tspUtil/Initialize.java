@@ -54,9 +54,8 @@ public class Initialize{
 	}
 	
 
-    public Initialize(String filepath){
+    private Initialize(String filepath){
 	    String s;
-	    int i = 0;
 	    List<Node> tempNodes = new ArrayList<Node>();
     	try{
 		    BufferedReader in = new BufferedReader(new FileReader(filepath));
@@ -66,9 +65,6 @@ public class Initialize{
 			    tempNodes.add(new Node(Integer.parseInt(splited[0]),
 					    Integer.parseInt(splited[1]),
 					    Integer.parseInt(splited[2])));
-//			    nodes[i++] = new Node(Integer.parseInt(splited[0]),
-//					    Integer.parseInt(splited[1]),
-//					    Integer.parseInt(splited[2]));
 			    s = in.readLine();
 		    }
 	    } catch(FileNotFoundException e){
@@ -86,7 +82,7 @@ public class Initialize{
 	    nodes = tempNodes.toArray(nodes);
 	    distance = new double[numOfCity][];
      
-	    for( i = 0; i < numOfCity; i++){
+	    for(int i = 0; i < numOfCity; i++){
         	distance[i] = new double[numOfCity];
             for(int j = 0; j < numOfCity; j++){
                 distance[i][j] = nodes[i].getDistance(nodes[j]);
@@ -119,7 +115,18 @@ public class Initialize{
 	return path;
 	}
 	
-    private int getStartIndex(Node[] randomPath){
+	public double checkPath(int[] path){
+		double ret = 0;
+		for(int i = 0; i < numOfCity - 1; i++){
+			ret += distance[path[i]][path[i + 1]];
+			System.out.println("present cost : " + distance[path[i]][path[i + 1]]);
+			System.out.println("cost from Node " + path[0] + " to Node " + path[i + 1] + " : " + ret);
+		}
+		System.out.println("total checked cost : " + ret);
+		return ret;
+	}
+	
+    private int getStartIndex(){
 	    int start = 0;
 	    double MAX = 0;
 	    for(int i = 0; i < numOfCity; i++){
@@ -132,11 +139,11 @@ public class Initialize{
 	    }
 	    return start;
     }
-    public void RandomPath(){
+    private void RandomPath(){
         Node[] randomPath = new Node[numOfCity];
         boolean[] isNoded = new boolean[numOfCity];
 	    Arrays.fill(isNoded, Boolean.TRUE);
-	    int start = getStartIndex(randomPath);
+	    int start = getStartIndex();
 	    randomPath[0] = nodes[start];
 	    this.path[0]=nodes[start].getIndex();
 		isNoded[start] = false;

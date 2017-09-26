@@ -15,14 +15,14 @@ public class NearestNeighbor extends TSPAlgorithm {
 	 * ���������κ��� �����ؼ� �湮���� ���� ���� ����� ���� �湮
 	 */
 	@Override
-	public int[] calculatePath(int startPoint) {
+	public int[] calculatePath() {
 		// TODO Auto-generated method stub
 		int[] path = new int[this.numOfCity + 1];
 
 		
-
-		path[0] = startPoint;
-		path[this.numOfCity] = startPoint;
+		//임시로 0으로 설정
+		path[0] = 0;
+		path[this.numOfCity] = 0;
 		
 		
 		path = this.calculatePath(path);

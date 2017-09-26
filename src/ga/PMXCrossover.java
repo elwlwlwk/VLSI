@@ -34,9 +34,11 @@ public class PMXCrossover implements Crossover{
 		}
 		
 		child[0].path = firstPath;
-		child[0].cost = PathCheck.getPathCost(child[0].path);
+		//임시로 int로 형 변환
+		child[0].cost = (int)PathCheck.getPathCost(child[0].path);
 		child[1].path = secondPath;
-		child[1].cost = PathCheck.getPathCost(child[1].path);
+		//임시로 int로 형 변환
+		child[1].cost = (int)PathCheck.getPathCost(child[1].path);
 		
 		return child;
 	}
