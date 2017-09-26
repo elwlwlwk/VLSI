@@ -1,10 +1,7 @@
 package sa;
 
 import java.util.Arrays;
-
 import greedy.ThreeOptSearch;
-import greedy.TwoOptSearch;
-import tspUtil.GetTwoRandomNumber;
 import tspUtil.Initialize;
 import tspUtil.PathCheck;
 import tspUtil.TSPAlgorithm;
@@ -12,18 +9,12 @@ import tspUtil.TSPAlgorithm;
 public class SASearch extends TSPAlgorithm{
 	private double temperature;
 	private double deltaTemperature;
-	private int numOfNextHop;
 	
-	
-	private TwoOptSearch twoOptSearch;
-	
-	public SASearch(double temperature, double deltaTemperature, int limitTrial, int numOfNextHop) {
-		this.twoOptSearch = new TwoOptSearch(limitTrial);
+	public SASearch(double temperature, double deltaTemperature) {
 		this.setSAParameter(temperature, deltaTemperature);
-		this.numOfNextHop = numOfNextHop;
 	}
 
-	public void setSAParameter(double temperature, double deltaTemperature) {
+	private void setSAParameter(double temperature, double deltaTemperature) {
 		if (temperature <= 0) {
 			System.err.println("Temperature must be bigger than 0");
 			System.exit(1);
@@ -37,7 +28,7 @@ public class SASearch extends TSPAlgorithm{
 	}
 
 	@Override
-	public int[] calculatePath(int startPoint) {
+	public int[] calculatePath() {
 		// TODO Auto-generated method stub
 		int[] path = Initialize.getInstance().getPath();
 		path = this.calculatePath(path);
@@ -47,28 +38,16 @@ public class SASearch extends TSPAlgorithm{
 	@Override
 	public int[] calculatePath(int[] path) {
 		// TODO Auto-generated method stub
-
 		int[] copyPath = Arrays.copyOf(path, path.length);
 		double bestScore = PathCheck.getPathCost(copyPath);
 		while (this.temperature > 1) {
 			int[] trialPath = Arrays.copyOf(copyPath, copyPath.length);
-			/*
-			for(int i = 0; i < this.numOfNextHop ; i++){
-				int[] twoRandNumber = GetTwoRandomNumber.getTwoRandomNumber();
-				int firstPoint = twoRandNumber[0];
-				int secondPoint = twoRandNumber[1];
-				this.twoOptSearch.swapPath(trialPath, firstPoint, secondPoint);
-			}
-			
-			trialPath = this.twoOptSearch.calculatePath(trialPath);
-			*/
 			trialPath = ThreeOptSearch.swap(trialPath);
 			double trialScore = PathCheck.getPathCost(trialPath);
 			if (Math.random() < this.getAcceptProbability(bestScore, trialScore)) {
 				copyPath = Arrays.copyOf(trialPath, trialPath.length);
 				bestScore = trialScore;
-			} 
-			
+			}
 			this.temperature *= this.deltaTemperature;
 		}
 		return copyPath;
@@ -76,9 +55,9 @@ public class SASearch extends TSPAlgorithm{
 
 	private double getAcceptProbability(double bestScore, double trialScore) {
 		if (bestScore > trialScore)
-			return 1;
+			return 1.0;
 		else {
-			return Math.pow(Math.E, -(trialScore - bestScore) / this.temperature);
+			return Math.pow(Math.E, (bestScore - trialScore) / this.temperature);
 		}
 	}
 	
