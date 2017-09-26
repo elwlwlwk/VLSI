@@ -48,7 +48,7 @@ public class SASearch extends TSPAlgorithm{
 				copyPath = Arrays.copyOf(trialPath, trialPath.length);
 				bestScore = trialScore;
 			}
-			this.temperature *= this.deltaTemperature;
+			this.temperature /= (1 + Math.log(this.deltaTemperature + 1));
 		}
 		return copyPath;
 	}

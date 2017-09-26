@@ -1,19 +1,5 @@
 package main;
 
-import java.util.Scanner;
-
-import ga.Crossover;
-import ga.Initializer;
-import ga.Mutation;
-import ga.MyGASearch;
-import ga.PMXCrossover;
-import ga.PseudoTournamentSelection;
-import ga.RandomInitializer;
-import ga.SAInitalizer;
-import ga.Selection;
-import ga.SwapMutation;
-import greedy.NearestNeighbor;
-import greedy.TwoOptSearch;
 import sa.SASearch;
 import tspUtil.PathCheck;
 import tspUtil.Initialize;
@@ -23,7 +9,7 @@ public class MainClass {
 		String mapName = "xqf131.tsp";
 		Initialize.getfile(mapName);
 		long start = System.currentTimeMillis();
-		SASearch saSearch = new SASearch(1000, 0.99);
+		SASearch saSearch = new SASearch(10000, 0.999);
 		int [] path3 = saSearch.calculatePath();
 		long end = System.currentTimeMillis();
 		System.out.println("실행시간 : " + (end - start) / 1000.0);
