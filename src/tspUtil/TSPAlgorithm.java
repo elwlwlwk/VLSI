@@ -9,6 +9,6 @@ public abstract class TSPAlgorithm {
 		this.numOfCity = Initialize.getInstance().getNumOfCity();
 	}
 	
-	public abstract int [] calculatePath(int startPoint);
+	public abstract int [] calculatePath();
 	public abstract int [] calculatePath(int [] path);
 }
