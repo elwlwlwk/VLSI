@@ -9,16 +9,22 @@ import java.util.Arrays;
 public class TwoOpt implements Opt {
 	@Override
 	public ArrayList<Node> Swap(ArrayList<Node> node) {
-		int index[] = {(int)(Math.random() * node.size()),
-				(int)(Math.random() * node.size())};
-		Arrays.sort(index);
+		int TrialMax = 10000;
+		ArrayList<Node> bestPath = new ArrayList<Node>(node);
+		System.out.println("start : " + ArrayUtill.cost(node));
+		for(int trial = 0; trial < TrialMax; trial++){
+			int index[] = {(int)(Math.random() * bestPath.size()),
+					(int)(Math.random() * bestPath.size())};
+			Arrays.sort(index);
+			
+			ArrayList<Node> subPath1 = new ArrayList<Node>(bestPath.subList(0, index[0]));
+			ArrayList<Node> subPath2 = new ArrayList<Node>(bestPath.subList(index[0], index[1]));
+			ArrayList<Node> subPath3 = new ArrayList<Node>(bestPath.subList(index[1], bestPath.size()));
+			
+			subPath2 = ArrayUtill.reverse(subPath2);
+			bestPath = ArrayUtill.concat(subPath1, ArrayUtill.concat(subPath2, subPath3));
+		}
 		
-		ArrayList<Node> subPath1 = (ArrayList)node.subList(0, index[0]);
-		ArrayList<Node> subPath2 = (ArrayList)node.subList(index[0], index[1]);
-		ArrayList<Node> subPath3 = (ArrayList)node.subList(index[1], node.size());
-		
-		subPath2 = ArrayUtill.reverse(subPath2);
-		node = ArrayUtill.concat(subPath1, ArrayUtill.concat(subPath2, subPath3));
-		return node;
+		return bestPath;
 	}
 }
