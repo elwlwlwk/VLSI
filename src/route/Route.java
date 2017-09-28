@@ -1,6 +1,6 @@
 package route;
 
-import DataStructure.TSPPath;
+import dataStructure.TSPPath;
 
 public interface Route {
 	public TSPPath getRoute();

@@ -1,6 +1,6 @@
 package route;
 
-import DataStructure.TSPPath;
+import dataStructure.TSPPath;
 
 import java.util.Arrays;
 

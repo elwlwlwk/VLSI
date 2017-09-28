@@ -1,6 +1,6 @@
 package opt;
 
-import DataStructure.Node;
+import dataStructure.Node;
 import java.util.ArrayList;
 
 public interface Opt {

@@ -1,5 +1,5 @@
-import DataStructure.Node;
-import DataStructure.TSPPath;
+import dataStructure.Node;
+import dataStructure.TSPPath;
 
 import java.io.*;
 

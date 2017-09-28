@@ -1,7 +1,8 @@
-package DataStructure;
+package dataStructure;
 
 import opt.Opt;
 import opt.ThreeOpt;
+import util.ArrayUtill;
 
 import java.util.ArrayList;
 
@@ -56,18 +57,6 @@ public class TSPPath {
 	}
 	
 	public void swap(){
-//		double dist1 = getDistance();
-		for(int i = 0; i < 1000000; i++){
-			this.path = opt.Swap(path);
-//			double dist2 = getDistance();
-//			if(dist1 < dist2){
-//				System.out.println("!!!!!!!!!!!!!!!!!!!!!");
-//				System.out.println(getDistance());
-//			}
-//			else{
-//				System.out.println(".");
-//			}
-		}
-		System.out.println(getDistance());
+		path = opt.Swap(path);
 	}
 }

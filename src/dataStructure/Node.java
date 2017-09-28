@@ -1,4 +1,4 @@
-package DataStructure;
+package dataStructure;
 
 public class Node {
 	private int index;
