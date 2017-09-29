@@ -15,7 +15,7 @@ public class RandomRoute implements Route {
 		boolean gone[] = new boolean[path.NumOfCity()];
 		Arrays.fill(gone, true);
 		TSPPath temp = new TSPPath();
-		while(temp.NumOfCity() == path.NumOfCity()){
+		while(temp.NumOfCity() < path.NumOfCity()){
 			int index = (int)(Math.random() * path.NumOfCity());
 			if(gone[index]){
 				temp.addNode(path.getNode(index));

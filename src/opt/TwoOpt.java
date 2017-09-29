@@ -11,7 +11,7 @@ public class TwoOpt implements Opt {
 	public ArrayList<Node> Swap(ArrayList<Node> node) {
 		int TrialMax = 10000;
 		ArrayList<Node> bestPath = new ArrayList<Node>(node);
-		System.out.println("start : " + ArrayUtill.cost(node));
+		
 		for(int trial = 0; trial < TrialMax; trial++){
 			int index[] = {(int)(Math.random() * bestPath.size()),
 					(int)(Math.random() * bestPath.size())};

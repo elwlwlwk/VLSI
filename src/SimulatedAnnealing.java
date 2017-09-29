@@ -1,5 +1,7 @@
 import cooling.CoolingFunction;
 import cooling.ExponentialCooling;
+import cooling.LinearCooling;
+import cooling.QuadraticCooling;
 import dataStructure.TSPPath;
 
 public class SimulatedAnnealing {
@@ -24,14 +26,28 @@ public class SimulatedAnnealing {
 		TSPPath best = new TSPPath(currentPath);
 		int counter = 0;
 		while(temperature > 1) {
-			TSPPath now = new TSPPath(best);
-			now.swap();
+			TSPPath neighborPath = new TSPPath(currentPath);
+			neighborPath.swap();
 			
 			double currentEnergy = currentPath.getDistance();
-			double neighbourEnergy = now.getDistance();
+			double neighborEnergy = neighborPath.getDistance();
+			System.out.println("current Energy : " + currentEnergy);
+			System.out.println("neighbour Energy : " + neighborEnergy);
 			
-			if (acceptanceProbability(currentEnergy, neighbourEnergy, temperature) > Math.random()) {
-				currentPath = new TSPPath(now);
+			double random = Math.random();
+			double real = acceptanceProbability(currentEnergy, neighborEnergy, temperature);
+			
+			if (real > random) {
+//				if(neighborPath.getDistance() > currentPath.getDistance()){
+//					System.out.println("Up!");
+//				}
+//				else {
+//					System.out.println("Down!");
+//				}
+				System.out.println("Accepted : " + real);
+				System.out.println("Random : " + random);
+				
+				currentPath = new TSPPath(neighborPath);
 			}
 			
 			if(currentPath.getDistance() < best.getDistance()){
@@ -39,14 +55,15 @@ public class SimulatedAnnealing {
 			}
 			
 			temperature *= cooling.coolingRate(deltaTemperature, counter++);
+			System.out.println("Temperature : " + temperature);
 		}
 		return best;
 	}
 	
-	private double acceptanceProbability(double cEnergy, double nEnergy, double temperature){
-		if(nEnergy < cEnergy){
+	private double acceptanceProbability(double currentEnergy, double neighborEnergy, double temperature){
+		if(neighborEnergy < currentEnergy){
 			return 1.0;
 		}
-		return Math.exp((cEnergy - nEnergy) / temperature);
+		return 1 / Math.exp((neighborEnergy - currentEnergy) / temperature);
 	}
 }

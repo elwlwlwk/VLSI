@@ -2,7 +2,6 @@ package dataStructure;
 
 import opt.Opt;
 import opt.ThreeOpt;
-import util.ArrayUtill;
 
 import java.util.ArrayList;
 
