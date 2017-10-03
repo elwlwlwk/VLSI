@@ -17,7 +17,7 @@ public class MainClass {
 				new LogarithmicalCooling(),
 				new QuadraticCooling()};
 		//calculate SE
-		SimulatedAnnealing SA = new SimulatedAnnealing(10, 0.999, coolingFunction[0]);
+		SimulatedAnnealing SA = new SimulatedAnnealing(100, 0.99, coolingFunction[0]);
 		TSPPath temp = SA.run(gr.getRoute());
 		manager.setData(temp);
 		long end = System.currentTimeMillis();

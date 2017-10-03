@@ -2,6 +2,8 @@ package opt;
 
 import dataStructure.Node;
 import util.ArrayUtill;
+import util.RecencyTabu;
+import util.Tabu;
 
 import java.awt.*;
 import java.lang.reflect.Array;
@@ -11,17 +13,24 @@ import java.util.Queue;
 
 
 public class ThreeOpt implements Opt {
+	Tabu tabu;
+	
+	public ThreeOpt(){
+		this(new RecencyTabu(30, 3));
+	}
+	
+	public ThreeOpt(Tabu tabu){
+		this.tabu = tabu;
+	}
+	
 	@Override
 	public ArrayList<Node> Swap(ArrayList<Node> node) {
-		int trialMax = 100;
+		int trialMax = 500;
 		double bestScore = Double.MAX_VALUE;
 		ArrayList<Node> bestPath = new ArrayList<Node>(node);
 		
 		for(int trial = 0; trial < trialMax; trial++){
-			int index[] = {(int)(Math.random() * bestPath.size()),
-					(int)(Math.random() * bestPath.size()),
-					(int)(Math.random() * bestPath.size())};
-			Arrays.sort(index);
+			int index[] = tabu.getOptIndex(node.size());
 			
 			ArrayList<Node> subPath1 = new ArrayList<Node>(bestPath.subList(0, index[0]));
 			ArrayList<Node> subPath2 = new ArrayList<Node>(bestPath.subList(index[0], index[1]));
