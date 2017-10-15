@@ -186,3 +186,17 @@ output/
 result\.txt
 
 *.iml
+
+*.opendb
+
+*.db
+
+*.sln
+
+*.vcxproj
+
+*.filters
+
+VLSI_cpp/Debug/
+
+VLSI_cpp/Release/
