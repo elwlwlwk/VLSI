@@ -6,7 +6,6 @@
 #include <math.h>
 #include <vector>
 #include <array>
-#include <ctime>
 #include <iostream>
 
 using namespace std;
@@ -71,7 +70,6 @@ vector<int> gen_trial_path_2opt(vector<int> path, vector<vector<double>> cost_ma
 	int max_iter = 5000;
 	for (int i = 0; i < max_iter; i++) {
 		vector<int> idxs;
-		srand(static_cast<unsigned int>(time(NULL)));
 
 		idxs.push_back(static_cast<int>(floor((double)rand() / RAND_MAX*path.size())));
 		idxs.push_back(static_cast<int>(floor((double)rand() / RAND_MAX*path.size())));
@@ -111,9 +109,14 @@ vector<int> simple_sa(vector<array<int, 3>> data, vector<vector<double>> cost_ma
 	double best_score = cur_score;
 
 	while (temperature >1) {
-		vector<int> trial_path = gen_trial_path_2opt(cur_path, cost_mat);
+		vector<int> temp_path(cur_path.begin()+1, cur_path.end() - 1);
+		vector<int> temp_path2(cur_path.begin(), cur_path.begin() + 1);
+		vector<int> temp_path3(gen_trial_path_2opt(temp_path, cost_mat));
+		temp_path2.insert(temp_path2.end(),temp_path3.begin(), temp_path3.end());
+		temp_path2.insert(temp_path2.end(), cur_path.end() - 1, cur_path.end());
+		vector<int> trial_path = temp_path2;
 		double trial_score = calc_score(trial_path, cost_mat);
-		if (rand() < calc_prob(cur_score, trial_score, temperature)) {
+		if ((double)rand()/RAND_MAX < calc_prob(cur_score, trial_score, temperature)) {
 			cur_path.clear();
 			cur_path.assign(trial_path.begin(), trial_path.end());
 			cur_score = trial_score;
@@ -251,8 +254,8 @@ auto fixedStartCluster(shared_ptr<vector<array<int, 3>>> node) {
 					});
 					first = vect.at(vect.size() - 1);
 					sort(vect.begin(), vect.end(), [chunk_x_size, chunk_y_size, vectRow, vectCol](const auto &a1, const auto &a2) -> bool {
-							return pow((chunk_x_size * (vectCol + 1) - a1[1]), 2) + pow((a1[2] - chunk_y_size * vectRow), 2)
-								< pow((chunk_x_size * (vectCol + 1) - a2[1]), 2) + pow((a1[2] - chunk_y_size * vectRow), 2);
+						return pow((chunk_x_size * (vectCol + 1) - a1[1]), 2) + pow((a1[2] - chunk_y_size * vectRow), 2)
+							< pow((chunk_x_size * (vectCol + 1) - a2[1]), 2) + pow((a1[2] - chunk_y_size * vectRow), 2);
 					});
 					last = vect.at(vect.size() - 1);
 				}
@@ -264,18 +267,25 @@ auto fixedStartCluster(shared_ptr<vector<array<int, 3>>> node) {
 			}
 		}
 	}
-	vector<vector<vector<int>>> pathes; 
+	vector<vector<vector<int>>> pathes;
 	for (int i = 0; i < chunk_num; i++) {
 		pathes.push_back(vector<vector<int>>());
 		pathes.at(i).assign(chunk_num, vector<int>());
 	}
+	for (int row = 0; row < chunks->size(); row++) {
+		for (int col = 0; col < chunks->at(row).size(); col++) {
+			auto vect = chunks->at(row).at(col);
+			pathes.at(row).at(col) = simple_sa(vect, cost_mat);
+		}
+	}
+	/*
 	for (auto outer = pathes.begin(); outer < pathes.cend(); ++outer) {
 		for (auto inner = pathes.begin()->begin(); inner < pathes.begin()->cend(); ++inner) {
 			auto vect = chunks->at(distance(pathes.begin(), outer)).at(distance(pathes.begin()->begin(), inner));
 			cout << "@@@@@@@@@@@@@@@@@@@@" << endl;
 			pathes[distance(pathes.begin(), outer)][distance(pathes.begin()->begin(), inner)] = simple_sa(vect, cost_mat);
 		}
-	}
+	}*/
 	int part_sum_score = 0;
 	vector<int>path;
 	for (auto row = chunks->begin(); row < chunks->cend(); ++row) {
