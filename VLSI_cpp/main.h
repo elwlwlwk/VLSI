@@ -71,8 +71,8 @@ vector<int> gen_trial_path_2opt(vector<int> path, vector<vector<double>> cost_ma
 	for (int i = 0; i < max_iter; i++) {
 		vector<int> idxs;
 
-		idxs.push_back(static_cast<int>(floor((double)rand() / RAND_MAX*path.size())));
-		idxs.push_back(static_cast<int>(floor((double)rand() / RAND_MAX*path.size())));
+		idxs.push_back(min((int)path.size() - 1, static_cast<int>(floor((double)rand() / RAND_MAX*(path.size()+1)))));
+		idxs.push_back(min((int)path.size() - 1, static_cast<int>(floor((double)rand() / RAND_MAX*(path.size()+1)))));
 		sort(idxs.begin(), idxs.end());
 
 		vector<int> new_path;
@@ -172,12 +172,12 @@ int getMaxNode(const shared_ptr<vector<array<int, 3>>> node, int index) {
 }
 
 auto fixedStartCluster(shared_ptr<vector<array<int, 3>>> node) {
-	const int chunk_size = 200;
+	const int chunk_size = 400;
 	const int chunk_num = static_cast<int>(sqrt(node->size() / chunk_size));
 	int x_min = getMinNode(node, 1);
 	int y_min = getMinNode(node, 2);
-	int chunk_x_size = (getMaxNode(node, 1) + 1 - x_min) / chunk_num;
-	int chunk_y_size = (getMaxNode(node, 2) + 1 - y_min) / chunk_num;
+	int chunk_x_size = ceil((double)(getMaxNode(node, 1) + 1 - x_min) / chunk_num);
+	int chunk_y_size = ceil((double)(getMaxNode(node, 2) + 1 - y_min) / chunk_num);
 	auto chunks = make_unique<vector<vector<vector<array<int, 3>>>>>();
 	vector<vector<double>> cost_mat = calc_cost_mat(node.get());
 
@@ -189,44 +189,33 @@ auto fixedStartCluster(shared_ptr<vector<array<int, 3>>> node) {
 	for (auto i = 0; i < node->size(); i++) {
 		int y = static_cast<int>(floor((node->at(i).at(2) - y_min) / chunk_y_size));
 		int x = static_cast<int>(floor((node->at(i).at(1) - x_min) / chunk_x_size));
+		cout << node->at(i).at(2) << " " << y_min << " " << chunk_y_size << " " << chunk_num<< endl;
 		chunks->at(y).at(x).push_back(node->at(i));
 		cout << y << " " << x << " " << chunks->at(y).at(x).size() << endl;
 	}
 	int vectRow, vectCol;
 	array<int, 3> last, first;
 
-	for (auto row = chunks->begin(); row < chunks->cend(); ++row) {
-		vectRow = row - chunks->begin();
-		if ((vectRow % 2) == 0) {
-			for (auto col = chunks->begin()->begin(); col < chunks->begin()->cend(); ++col) {
-				vectCol = col - chunks->begin()->begin();
-				auto& vect = chunks->at(vectRow).at(vectCol);
-
-				if (vectCol == 0) {
-					sort(vect.begin(), vect.end(), [chunk_x_size, chunk_y_size, vectRow, vectCol](const auto &a1, const auto &a2) -> bool {
-						return pow((a1[1] - chunk_x_size * vectCol), 2) + pow((a1[2] - chunk_y_size * vectRow), 2)
-							< pow((a2[1] - chunk_x_size * vectCol), 2) + pow((a2[2] - chunk_x_size * vectRow), 2);
+	for (int row = 0; row<chunks->size(); row++) {
+		if (row % 1 == 0) {
+			for (int col = 0; col < chunks->at(row).size(); col++) {
+				vector<array<int,3>> vect= chunks->at(row).at(col);
+				if (col == 0) {
+					sort(vect.begin(), vect.end(), [chunk_x_size, chunk_y_size, row, col](const auto &a1, const auto &a2) -> bool {
+						return pow((a1[1] - chunk_x_size*col), 2) + pow((a1[2] - chunk_y_size*row), 2) < pow((a2[1] - chunk_x_size*col), 2) + pow((a2[2] - chunk_y_size*row), 2);
 					});
-
-					cout << chunks->size() << endl;
-					cout << chunks->at(vectRow).size() << endl;
-					cout << chunks->at(vectRow).at(vectCol).size() << endl;
-					cout << vect.size() << endl;
-
 					first = vect.at(0);
 					last = vect.at(vect.size() - 1);
 				}
 				else {
-					sort(vect.begin(), vect.end(), [chunk_x_size, chunk_y_size, vectRow, vectCol](const auto &a1, const auto &a2) -> bool {
-						return pow((a1[1] - chunk_x_size * vectCol), 2) + pow((a1[2] - chunk_y_size * vectRow), 2)
-							< pow((a2[1] - chunk_x_size * vectCol), 2) + pow((a2[2] - chunk_x_size * vectRow), 2);
-					});
-					first = vect.at(vect.size() - 1);
-					sort(vect.begin(), vect.end(), [chunk_x_size, chunk_y_size, vectRow, vectCol](const auto &a1, const auto &a2) -> bool {
-						return pow((chunk_x_size * (vectCol + 1) - a1[1]), 2) + pow((a1[2] - chunk_y_size * vectRow), 2)
-							< pow((chunk_x_size * (vectCol + 1) - a2[1]), 2) + pow((a2[2] - chunk_y_size * vectRow), 2);
+					sort(vect.begin(), vect.end(), [chunk_x_size, chunk_y_size, row, col](const auto &a1, const auto &a2) -> bool {
+						return pow((a1[1] - chunk_x_size*col), 2) + pow((a1[2] - chunk_y_size*row), 2) < pow((a2[1] - chunk_x_size*col), 2) + pow((a2[2] - chunk_y_size*row), 2);
 					});
 					last = vect.at(vect.size() - 1);
+					sort(vect.begin(), vect.end(), [chunk_x_size, chunk_y_size, row, col](const auto &a1, const auto &a2) -> bool {
+						return pow(chunk_x_size*(col+1)-a1[1], 2) + pow((a1[2] - chunk_y_size*row), 2) > pow(chunk_x_size*(col + 1) - a2[1], 2) + pow((a2[2] - chunk_y_size*row), 2);
+					});
+					first = vect.at(vect.size() - 1);
 				}
 				vect.erase(find(vect.begin(), vect.end(), last));
 				vect.erase(find(vect.begin(), vect.end(), first));
@@ -235,27 +224,22 @@ auto fixedStartCluster(shared_ptr<vector<array<int, 3>>> node) {
 			}
 		}
 		else {
-			for (auto col = chunks->begin()->rbegin(); col > chunks->begin()->rend(); --col) {
-				vectCol = chunks->begin()->rbegin() - col;
-				auto& vect = chunks->at(vectRow).at(vectCol);
-
-				if (vectCol == 0) {
-					sort(vect.begin(), vect.end(), [chunk_x_size, chunk_y_size, vectRow, vectCol](const auto &a1, const auto &a2) -> bool {
-						return pow((a1[1] - chunk_x_size * vectCol), 2) + pow((a1[2] - chunk_y_size * vectRow), 2)
-							< pow((a2[1] - chunk_x_size * vectCol), 2) + pow((a2[2] - chunk_x_size * vectRow), 2);
+			for (int col = chunks->at(row).size() - 1; col >= 0; col--) {
+				vector<array<int, 3>> vect = chunks->at(row).at(col);
+				if (col == chunks->at(row).size()-1) {
+					sort(vect.begin(), vect.end(), [chunk_x_size, chunk_y_size, row, col](const auto &a1, const auto &a2) -> bool {
+						return pow(chunk_x_size*(col + 1) - a1[1], 2) + pow((a1[2] - chunk_y_size*row), 2) < pow(chunk_x_size*(col + 1) - a2[1], 2) + pow((a2[2] - chunk_y_size*row), 2);
 					});
 					first = vect.at(0);
 					last = vect.at(vect.size() - 1);
 				}
 				else {
-					sort(vect.begin(), vect.end(), [chunk_x_size, chunk_y_size, vectRow, vectCol](const auto &a1, const auto &a2) -> bool {
-						return pow((a1[1] - chunk_x_size * vectCol), 2) + pow((a1[2] - chunk_y_size * vectRow), 2)
-							< pow((a2[1] - chunk_x_size * vectCol), 2) + pow((a2[2] - chunk_x_size * vectRow), 2);
+					sort(vect.begin(), vect.end(), [chunk_x_size, chunk_y_size, row, col](const auto &a1, const auto &a2) -> bool {
+						return pow((a1[1] - chunk_x_size*col), 2) + pow((a1[2] - chunk_y_size*row), 2) < pow((a2[1] - chunk_x_size*col), 2) + pow((a2[2] - chunk_y_size*row), 2);
 					});
 					first = vect.at(vect.size() - 1);
-					sort(vect.begin(), vect.end(), [chunk_x_size, chunk_y_size, vectRow, vectCol](const auto &a1, const auto &a2) -> bool {
-						return pow((chunk_x_size * (vectCol + 1) - a1[1]), 2) + pow((a1[2] - chunk_y_size * vectRow), 2)
-							< pow((chunk_x_size * (vectCol + 1) - a2[1]), 2) + pow((a1[2] - chunk_y_size * vectRow), 2);
+					sort(vect.begin(), vect.end(), [chunk_x_size, chunk_y_size, row, col](const auto &a1, const auto &a2) -> bool {
+						return pow(chunk_x_size*(col + 1) - a1[1], 2) + pow((a1[2] - chunk_y_size*row), 2) < pow(chunk_x_size*(col + 1) - a2[1], 2) + pow((a2[2] - chunk_y_size*row), 2);
 					});
 					last = vect.at(vect.size() - 1);
 				}
@@ -263,7 +247,6 @@ auto fixedStartCluster(shared_ptr<vector<array<int, 3>>> node) {
 				vect.erase(find(vect.begin(), vect.end(), first));
 				vect.push_back(last);
 				vect.insert(vect.begin(), first);
-
 			}
 		}
 	}
@@ -288,27 +271,20 @@ auto fixedStartCluster(shared_ptr<vector<array<int, 3>>> node) {
 	}*/
 	int part_sum_score = 0;
 	vector<int>path;
-	for (auto row = chunks->begin(); row < chunks->cend(); ++row) {
-		int rowDiff = row - chunks->begin();
-		if ((rowDiff % 2) == 0) {
-			for (auto col = chunks->begin()->begin(); col < chunks->begin()->cend(); ++col) {
-				cout << distance(chunks->begin(), row) << " " << distance(chunks->begin()->begin(), col) << endl;
-				auto iteratingPath = pathes[distance(chunks->begin(), row)][distance(chunks->begin()->begin(), col)];
-				for (auto iter = iteratingPath.begin(); iter < iteratingPath.end(); ++iter) {
-					path.emplace_back(*iter);
-				}
-				//path.emplace(path.end(), pathes[row - chunks->begin()][col - chunks->begin()->begin()]);
+
+	for (int row = 0; row < pathes.size(); row++) {
+		if (row % 2 == 0) {
+			for (int col = 0; col < pathes.at(row).size(); col++) {
+				path.insert(path.end(), pathes.at(row).at(col).begin(), pathes.at(row).at(col).end());
 			}
 		}
 		else {
-			for (auto col = chunks->begin()->rbegin(); col < chunks->begin()->rend(); ++col) {
-				cout << distance(chunks->begin(), row) << " " << distance(chunks->begin()->rbegin(), col) << endl;
-				auto iteratingPath = pathes[distance(chunks->begin(), row)][distance(chunks->begin()->rbegin(), col)];
-				for (auto iter = iteratingPath.rbegin(); iter < iteratingPath.rend(); ++iter) {
-					path.emplace_back(*iter);
-				}
-				//path.emplace(path.end(), pathes[row - chunks->begin()][chunks->begin()->rbegin() - col]);
+			vector<int> reversed_path;
+			for (int col = 0; col < pathes.at(row).size(); col++) {
+				reversed_path.insert(reversed_path.end(), pathes.at(row).at(col).begin(), pathes.at(row).at(col).end());
 			}
+			reverse(reversed_path.begin(), reversed_path.end());
+			path.insert(path.end(), reversed_path.begin(), reversed_path.end());
 		}
 	}
 	double score = calc_score(path, cost_mat);

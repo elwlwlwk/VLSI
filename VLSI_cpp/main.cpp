@@ -1,4 +1,4 @@
-#include <ctime>
+ï»¿#include <ctime>
 #include "main.h"
 
 using namespace std;
@@ -7,13 +7,13 @@ int main() {
 	clock_t begin, end;
 
 	srand(static_cast<unsigned int>(time(NULL)));
-	auto temp = fixedStartCluster(readFile("pbd984.tsp"));
+	auto temp = fixedStartCluster(readFile("frv4410.tsp"));
 	begin = clock();
 	for (auto iter = temp.begin(); iter < temp.end(); ++iter) {
 		cout << *iter << " ";
 	}
 	end = clock();
-	cout << "\n¼öÇà ½Ã°£ : " << static_cast<double>(end - begin) / CLOCKS_PER_SEC << endl;
+	cout << "\nìˆ˜í–‰ ì‹œê°„ : " << end <<" "<< begin << endl;
 	int a;
 	cin >> a;
 
