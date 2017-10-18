@@ -10,30 +10,38 @@
 
 using namespace std;
 
-vector<vector<double>> calc_cost_mat(vector<array<int, 3>>* data) {
-	vector<vector<double>> cost_mat(data->size(), vector<double>(data->size()));
+vector<vector<float>> calc_cost_mat(vector<array<int, 3>>* data) {
+	vector<vector<float>> cost_mat(data->size(), vector<float>(data->size()));
 	array<int, 3> p1;
 	array<int, 3> p2;
 	for (auto i = 0; i < cost_mat.size(); i++) {
 		for (auto j = 0; j < cost_mat.size(); j++) {
 			p1 = data->at(i);
 			p2 = data->at(j);
-			double distance = sqrt(pow(p1[1] - p2[1], 2) + pow(p1[2] - p2[2], 2));
+			float distance = sqrt(pow(p1[1] - p2[1], 2) + pow(p1[2] - p2[2], 2));
 			cost_mat.at(p1[0] - 1).at(p2[0] - 1) = cost_mat.at(p2[0] - 1).at(p1[0] - 1) = distance;
 		}
 	}
 	return cost_mat;
 }
 
-double calc_score(vector<int> path, vector<vector<double>> &cost_mat) {
-	double cost = 0;
+float calc_score(vector<int> path, vector<vector<float>> &cost_mat) {
+	float cost = 0;
 	for (auto i = 0; i < path.size() - 1; i++) {
 		cost += cost_mat.at(path.at(i) - 1).at(path.at(i + 1) - 1);
 	}
 	return cost;
 }
 
-double calc_prob(double best_score, double trial_score, double temperature) {
+float calc_score(int* path, int len, float** cost_mat) {
+	float cost = 0;
+	for (auto i = 0; i < len - 1; i++) {
+		cost += cost_mat[path[i] - 1][path[i + 1] - 1];
+	}
+	return cost;
+}
+
+float calc_prob(float best_score, float trial_score, float temperature) {
 	if (best_score> trial_score) {
 		return 1;
 	}
@@ -42,10 +50,10 @@ double calc_prob(double best_score, double trial_score, double temperature) {
 	}
 }
 
-double get_inter_cost(vector<vector<int>> paths, vector<vector<double>> cost_mat) {
-	double inter_cost = 0;
-	double last_point = -1;
-	double first_point = -1;
+float get_inter_cost(vector<vector<int>> paths, vector<vector<float>> cost_mat) {
+	float inter_cost = 0;
+	float last_point = -1;
+	float first_point = -1;
 	for (auto idx = 0; idx < paths.size() - 1; idx++) {
 		if (paths[idx].size() != 0) {
 			last_point = paths.at(idx).back();
@@ -54,7 +62,7 @@ double get_inter_cost(vector<vector<int>> paths, vector<vector<double>> cost_mat
 			first_point = paths.at(idx + 1).at(0) - 1;
 		}
 		if (last_point != -1 && first_point != -1) {
-			inter_cost += static_cast<double>(cost_mat.at(first_point).at(last_point));
+			inter_cost += static_cast<float>(cost_mat.at(first_point).at(last_point));
 			last_point = -1;
 			first_point = -1;
 		}
@@ -63,16 +71,16 @@ double get_inter_cost(vector<vector<int>> paths, vector<vector<double>> cost_mat
 }
 
 
-vector<int> gen_trial_path_2opt(vector<int> path, vector<vector<double>> cost_mat) {
+vector<int> gen_trial_path_2opt(vector<int> path, float** cost_mat) {
 	vector<int>best_path(path);
-	double best_score = 999999999;
+	float best_score = 999999999;
 
-	int max_iter = 5000;
+	int max_iter = 30000;
 	for (int i = 0; i < max_iter; i++) {
 		vector<int> idxs;
 
-		idxs.push_back(min((int)path.size() - 1, static_cast<int>(floor((double)rand() / RAND_MAX*(path.size()+1)))));
-		idxs.push_back(min((int)path.size() - 1, static_cast<int>(floor((double)rand() / RAND_MAX*(path.size()+1)))));
+		idxs.push_back(min((int)path.size(), static_cast<int>(floor((float)rand() / (RAND_MAX+1)*(path.size()+1)))));
+		idxs.push_back(min((int)path.size(), static_cast<int>(floor((float)rand() / (RAND_MAX+1)*(path.size()+1)))));
 		sort(idxs.begin(), idxs.end());
 
 		vector<int> new_path;
@@ -81,8 +89,9 @@ vector<int> gen_trial_path_2opt(vector<int> path, vector<vector<double>> cost_ma
 		new_path.insert(new_path.end(), best_path.begin(), best_path.begin() + idxs.at(0));
 		new_path.insert(new_path.end(), rev_sub_path.begin(), rev_sub_path.end());
 		new_path.insert(new_path.end(), best_path.begin() + idxs.at(1), best_path.end());
+		int* p = &new_path[0];
 
-		double new_score = calc_score(new_path, cost_mat);
+		float new_score = calc_score(p, new_path.size(), cost_mat);
 		if (new_score < best_score) {
 			best_path.clear();
 			best_path.assign(new_path.begin(), new_path.end());
@@ -93,30 +102,47 @@ vector<int> gen_trial_path_2opt(vector<int> path, vector<vector<double>> cost_ma
 	return best_path;
 }
 
-vector<int> simple_sa(vector<array<int, 3>> data, vector<vector<double>> cost_mat) {
-	double temperature = 10;
-	double delta_temperature = 0.97;
-
-	vector<int> cur_path;
-	int a = data.size();
-	cur_path.assign(a, -1);
-	for (auto i = 0; i < cur_path.size(); i++) {
-		cur_path[i] = data[i][0];
+float** setupHMM(vector<vector<float> > &vals, int N, int M)
+{
+	float** temp;
+	temp = new float*[N];
+	for (unsigned i = 0; (i < N); i++)
+	{
+		temp[i] = new float[M];
+		for (unsigned j = 0; (j < M); j++)
+		{
+			temp[i][j] = vals[i][j];
+		}
 	}
-	double cur_score = calc_score(cur_path, cost_mat);
+	return temp;
+}
+
+vector<int> simple_sa(vector<int> path, vector<vector<float>> cost_mat) {
+	float temperature = 10;
+	float delta_temperature = 0.97;
+
+	float** arr_costmat = setupHMM(cost_mat, cost_mat.size(), cost_mat.at(0).size());
+	int costmat_size = cost_mat.size();
+
+	vector<int> cur_path(path);
+
+	int* p = &cur_path[0];
+	float cur_score = calc_score(p,cur_path.size(), arr_costmat);
 
 	vector<int> best_path(cur_path);
-	double best_score = cur_score;
+	float best_score = cur_score;
+
+
 
 	while (temperature >1) {
 		vector<int> temp_path(cur_path.begin()+1, cur_path.end() - 1);
 		vector<int> temp_path2(cur_path.begin(), cur_path.begin() + 1);
-		vector<int> temp_path3(gen_trial_path_2opt(temp_path, cost_mat));
+		vector<int> temp_path3(gen_trial_path_2opt(temp_path, arr_costmat));
 		temp_path2.insert(temp_path2.end(),temp_path3.begin(), temp_path3.end());
 		temp_path2.insert(temp_path2.end(), cur_path.end() - 1, cur_path.end());
 		vector<int> trial_path = temp_path2;
-		double trial_score = calc_score(trial_path, cost_mat);
-		if ((double)rand()/RAND_MAX < calc_prob(cur_score, trial_score, temperature)) {
+		float trial_score = calc_score(trial_path, cost_mat);
+		if ((float)rand()/RAND_MAX < calc_prob(cur_score, trial_score, temperature)) {
 			cur_path.clear();
 			cur_path.assign(trial_path.begin(), trial_path.end());
 			cur_score = trial_score;
@@ -130,6 +156,12 @@ vector<int> simple_sa(vector<array<int, 3>> data, vector<vector<double>> cost_ma
 		}
 		cout << temperature << endl;
 	}
+
+	for (int i = 0; i < costmat_size; i++) {
+		delete[] arr_costmat[i];
+	}
+	delete[] arr_costmat;
+
 	return best_path;
 }
 
@@ -171,15 +203,68 @@ int getMaxNode(const shared_ptr<vector<array<int, 3>>> node, int index) {
 	return maxValue;
 }
 
+vector<int> sorting(vector<float> &arr) {
+	vector<int> retArr;
+	vector<bool> visited;
+	vector<float> sortedArr(arr);
+
+	retArr.assign(arr.size(), -1);
+	visited.assign(arr.size(), false);
+
+	sort(sortedArr.begin(), sortedArr.end(), [](const auto &a1, const auto &a2)-> bool {
+		return a1 < a2;
+	});
+
+	float* asortedArr = &sortedArr[0];
+	float* aarr = &arr[0];
+	int arr_size = arr.size();
+	for (int i = 0; i < arr_size; i++) {
+		for (int j = 0; j < arr_size; j++) {
+			if (aarr[j] == asortedArr[i] && visited.at(j) != true) {
+				retArr.at(i) = j;
+				visited.at(j) = true;
+				break;
+			}
+		}
+	}
+	return retArr;
+}
+
+vector<int> nearestNeighbor(shared_ptr<vector<array<int,3>>> node) {
+	vector<vector<float>> cost_mat = calc_cost_mat(node.get());
+	vector<bool> visited;
+	visited.assign(node->size(), false);
+	vector<int> path;
+	path.assign(node->size(), 0);
+
+	visited.at(0) = true;
+
+	for (int i = 0; i < node->size(); i++) {
+		vector<int> indexOfSortedArr = sorting(cost_mat.at(i));
+		for (int j = 0; j < node->size(); j++) {
+			if (!visited.at(indexOfSortedArr.at(j))) {
+				path.at(i + 1) = indexOfSortedArr[j];
+				visited.at(indexOfSortedArr.at(j)) = true;
+				break;
+			}
+		}
+		cout << i << endl;
+	}
+	for (int i = 0; i < path.size(); i++) {
+		path.at(i) = path.at(i) + 1;
+	}
+	return path;
+}
+
 auto fixedStartCluster(shared_ptr<vector<array<int, 3>>> node) {
-	const int chunk_size = 400;
+	const int chunk_size = 200;
 	const int chunk_num = static_cast<int>(sqrt(node->size() / chunk_size));
 	int x_min = getMinNode(node, 1);
 	int y_min = getMinNode(node, 2);
-	int chunk_x_size = ceil((double)(getMaxNode(node, 1) + 1 - x_min) / chunk_num);
-	int chunk_y_size = ceil((double)(getMaxNode(node, 2) + 1 - y_min) / chunk_num);
+	int chunk_x_size = ceil((float)(getMaxNode(node, 1) + 1 - x_min) / chunk_num);
+	int chunk_y_size = ceil((float)(getMaxNode(node, 2) + 1 - y_min) / chunk_num);
 	auto chunks = make_unique<vector<vector<vector<array<int, 3>>>>>();
-	vector<vector<double>> cost_mat = calc_cost_mat(node.get());
+	vector<vector<float>> cost_mat = calc_cost_mat(node.get());
 
 	for (int i = 0; i < chunk_num; i++) {
 		chunks->push_back(vector<vector<array<int, 3>>>());
@@ -189,15 +274,13 @@ auto fixedStartCluster(shared_ptr<vector<array<int, 3>>> node) {
 	for (auto i = 0; i < node->size(); i++) {
 		int y = static_cast<int>(floor((node->at(i).at(2) - y_min) / chunk_y_size));
 		int x = static_cast<int>(floor((node->at(i).at(1) - x_min) / chunk_x_size));
-		cout << node->at(i).at(2) << " " << y_min << " " << chunk_y_size << " " << chunk_num<< endl;
 		chunks->at(y).at(x).push_back(node->at(i));
-		cout << y << " " << x << " " << chunks->at(y).at(x).size() << endl;
 	}
 	int vectRow, vectCol;
 	array<int, 3> last, first;
 
 	for (int row = 0; row<chunks->size(); row++) {
-		if (row % 1 == 0) {
+		if (row % 2 == 0) {
 			for (int col = 0; col < chunks->at(row).size(); col++) {
 				vector<array<int,3>> vect= chunks->at(row).at(col);
 				if (col == 0) {
@@ -215,12 +298,14 @@ auto fixedStartCluster(shared_ptr<vector<array<int, 3>>> node) {
 					sort(vect.begin(), vect.end(), [chunk_x_size, chunk_y_size, row, col](const auto &a1, const auto &a2) -> bool {
 						return pow(chunk_x_size*(col+1)-a1[1], 2) + pow((a1[2] - chunk_y_size*row), 2) > pow(chunk_x_size*(col + 1) - a2[1], 2) + pow((a2[2] - chunk_y_size*row), 2);
 					});
-					first = vect.at(vect.size() - 1);
+					first = vect.at(0);
 				}
+				cout << first[0] <<" " << first[1] << " " << first[2] << " " << last[0] << " " << last[1] << " " << last[2] << endl;
 				vect.erase(find(vect.begin(), vect.end(), last));
 				vect.erase(find(vect.begin(), vect.end(), first));
 				vect.push_back(last);
 				vect.insert(vect.begin(), first);
+				chunks->at(row).at(col) = vect;
 			}
 		}
 		else {
@@ -243,10 +328,12 @@ auto fixedStartCluster(shared_ptr<vector<array<int, 3>>> node) {
 					});
 					last = vect.at(vect.size() - 1);
 				}
+				cout << first[0] << " " << first[1] << " " << first[2] << " " << last[0] << " " << last[1] << " " << last[2] << endl;
 				vect.erase(find(vect.begin(), vect.end(), last));
 				vect.erase(find(vect.begin(), vect.end(), first));
 				vect.push_back(last);
 				vect.insert(vect.begin(), first);
+				chunks->at(row).at(col) = vect;
 			}
 		}
 	}
@@ -258,7 +345,11 @@ auto fixedStartCluster(shared_ptr<vector<array<int, 3>>> node) {
 	for (int row = 0; row < chunks->size(); row++) {
 		for (int col = 0; col < chunks->at(row).size(); col++) {
 			auto vect = chunks->at(row).at(col);
-			pathes.at(row).at(col) = simple_sa(vect, cost_mat);
+			vector<int> path;
+			for (int i = 0; i < vect.size(); i++) {
+				path.push_back(vect.at(i)[0]);
+			}
+			pathes.at(row).at(col) = simple_sa(path, cost_mat);
 		}
 	}
 	/*
@@ -273,21 +364,25 @@ auto fixedStartCluster(shared_ptr<vector<array<int, 3>>> node) {
 	vector<int>path;
 
 	for (int row = 0; row < pathes.size(); row++) {
+		for (int col = 0; col < pathes.at(row).size(); col++) {
+			cout << pathes.at(row).at(col).at(0) <<" " <<pathes.at(row).at(col).at(pathes.at(row).at(col).size()-1) << endl;
+		}
+	}
+
+	for (int row = 0; row < pathes.size(); row++) {
 		if (row % 2 == 0) {
 			for (int col = 0; col < pathes.at(row).size(); col++) {
 				path.insert(path.end(), pathes.at(row).at(col).begin(), pathes.at(row).at(col).end());
 			}
 		}
 		else {
-			vector<int> reversed_path;
-			for (int col = 0; col < pathes.at(row).size(); col++) {
-				reversed_path.insert(reversed_path.end(), pathes.at(row).at(col).begin(), pathes.at(row).at(col).end());
+
+			for (int col = pathes.at(row).size()-1; col >= 0; col--) {
+				path.insert(path.end(), pathes.at(row).at(col).begin(), pathes.at(row).at(col).end());
 			}
-			reverse(reversed_path.begin(), reversed_path.end());
-			path.insert(path.end(), reversed_path.begin(), reversed_path.end());
 		}
 	}
-	double score = calc_score(path, cost_mat);
+	float score = calc_score(path, cost_mat);
 	cout << score << endl;
 	return path;
 }

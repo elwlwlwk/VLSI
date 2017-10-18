@@ -7,6 +7,7 @@ int main() {
 	clock_t begin, end;
 
 	srand(static_cast<unsigned int>(time(NULL)));
+	//auto temp = nearestNeighbor(readFile("frv4410.tsp"));
 	auto temp = fixedStartCluster(readFile("frv4410.tsp"));
 	begin = clock();
 	for (auto iter = temp.begin(); iter < temp.end(); ++iter) {
