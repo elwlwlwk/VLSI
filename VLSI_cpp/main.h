@@ -76,27 +76,37 @@ vector<int> gen_trial_path_2opt(vector<int> path, float** cost_mat) {
 	float best_score = 999999999;
 
 	int max_iter = 30000;
+	int path_len = path.size();
 	for (int i = 0; i < max_iter; i++) {
-		vector<int> idxs;
+		int idx0= min(path_len, static_cast<int>(floor((float)rand() / (RAND_MAX+1)*(path_len +1))));
+		int idx1= min(path_len, static_cast<int>(floor((float)rand() / (RAND_MAX+1)*(path_len +1))));
+		if (idx0 > idx1) {
+			idx0 += idx1;
+			idx1 = idx0 - idx1;
+			idx0 -= idx1;
+		}
+		else if (idx0 == idx1) {
+			continue;
+		}
 
-		idxs.push_back(min((int)path.size(), static_cast<int>(floor((float)rand() / (RAND_MAX+1)*(path.size()+1)))));
-		idxs.push_back(min((int)path.size(), static_cast<int>(floor((float)rand() / (RAND_MAX+1)*(path.size()+1)))));
-		sort(idxs.begin(), idxs.end());
+		vector<int> rev_sub_path(best_path.rbegin() + path_len-idx1, best_path.rbegin() + path_len-idx0);
 
-		vector<int> new_path;
-		vector<int> rev_sub_path(best_path.begin() + idxs.at(0), best_path.begin() + idxs.at(1));
-		reverse(rev_sub_path.begin(), rev_sub_path.end());
-		new_path.insert(new_path.end(), best_path.begin(), best_path.begin() + idxs.at(0));
-		new_path.insert(new_path.end(), rev_sub_path.begin(), rev_sub_path.end());
-		new_path.insert(new_path.end(), best_path.begin() + idxs.at(1), best_path.end());
-		int* p = &new_path[0];
+		int* np = new int[path_len];
 
-		float new_score = calc_score(p, new_path.size(), cost_mat);
+		int* bp = &best_path[0];
+		int* rp = &rev_sub_path[0];
+
+		memcpy(np, bp, sizeof(int)*idx0);
+		memcpy(np + idx0, rp, sizeof(int)*(idx1 - idx0));
+		memcpy(np + idx1, bp + idx1, sizeof(int)*(path_len - idx1));
+
+		float new_score = calc_score(np, path_len, cost_mat);
 		if (new_score < best_score) {
 			best_path.clear();
-			best_path.assign(new_path.begin(), new_path.end());
+			best_path.assign(np, np + path_len);
 			best_score = new_score;
 		}
+		delete[] np;
 	}
 
 	return best_path;
